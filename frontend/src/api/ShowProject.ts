@@ -1,21 +1,24 @@
-import { mockData } from "../mocks/seedData";
 import type { ShowProject } from "../types/ShowProject";
+import { createProject, listProjects, touchProject } from "../services/showProjectService";
+import { StageLightError } from "../errors/StageLightError";
+import { ERROR_CODES } from "../constants/errorCodes";
 
-const endpoint = "/api/show-project";
-
-export async function listShowProject(): Promise<ShowProject[]> {
-  if (typeof fetch !== "undefined" && endpoint.startsWith("/api") && false) {
-    try {
-      const res = await fetch(endpoint);
-      if (res.ok) return await res.json();
-    } catch {
-      // Local mock fallback keeps the UI available during offline review.
-    }
-  }
-  return [...(mockData.showProject as unknown as ShowProject[])];
+function toControllerError(error: unknown): StageLightError {
+  if (error instanceof StageLightError) return error;
+  return new StageLightError(ERROR_CODES.VALIDATION_FAILED, {});
 }
 
-export async function saveShowProject(payload: ShowProject) {
-  console.info("save ShowProject", payload);
-  return payload;
+export async function listShowProject(): Promise<ShowProject[]> {
+  return listProjects().catch((error) => {
+    throw toControllerError(error);
+  });
+}
+
+export async function saveShowProject(payload: ShowProject): Promise<ShowProject> {
+  try {
+    if (payload.id > 0) return await touchProject(payload);
+    return await createProject(payload);
+  } catch (error) {
+    throw toControllerError(error);
+  }
 }

@@ -1,21 +1,55 @@
-import { mockData } from "../mocks/seedData";
 import type { TimelineTrack } from "../types/TimelineTrack";
+import type { CueScene } from "../types/CueScene";
+import {
+  createTrack,
+  listTracks,
+  setTrackLocked,
+  switchTracksToScene,
+  updateTrack
+} from "../services/timelineTrackService";
+import { StageLightError } from "../errors/StageLightError";
+import { ERROR_CODES } from "../constants/errorCodes";
 
-const endpoint = "/api/timeline-track";
-
-export async function listTimelineTrack(): Promise<TimelineTrack[]> {
-  if (typeof fetch !== "undefined" && endpoint.startsWith("/api") && false) {
-    try {
-      const res = await fetch(endpoint);
-      if (res.ok) return await res.json();
-    } catch {
-      // Local mock fallback keeps the UI available during offline review.
-    }
-  }
-  return [...(mockData.timelineTrack as unknown as TimelineTrack[])];
+function toControllerError(error: unknown): StageLightError {
+  if (error instanceof StageLightError) return error;
+  return new StageLightError(ERROR_CODES.VALIDATION_FAILED, {});
 }
 
-export async function saveTimelineTrack(payload: TimelineTrack) {
-  console.info("save TimelineTrack", payload);
-  return payload;
+export async function listTimelineTrack(): Promise<TimelineTrack[]> {
+  return listTracks().catch((error) => {
+    throw toControllerError(error);
+  });
+}
+
+export async function saveTimelineTrack(payload: TimelineTrack): Promise<TimelineTrack> {
+  try {
+    if (payload.id > 0) return await updateTrack(payload);
+    return await createTrack(payload);
+  } catch (error) {
+    throw toControllerError(error);
+  }
+}
+
+export async function toggleTimelineTrackLock(
+  payload: TimelineTrack
+): Promise<TimelineTrack> {
+  try {
+    return await setTrackLocked(payload);
+  } catch (error) {
+    throw toControllerError(error);
+  }
+}
+
+/** 轨道改用新场景（旧场景归档前置）。 */
+export async function repointTimelineTracks(
+  fromSceneId: number,
+  toSceneId: number,
+  scenes?: CueScene[],
+  trackIds?: number[]
+): Promise<TimelineTrack[]> {
+  try {
+    return await switchTracksToScene(fromSceneId, toSceneId, scenes, trackIds);
+  } catch (error) {
+    throw toControllerError(error);
+  }
 }
