@@ -1,4 +1,4 @@
-import { mockData } from "../mocks/seedData";
+import { getAll, putRow, deleteRow, STORES } from "../db";
 import type { CueScene } from "../types/CueScene";
 
 const endpoint = "/api/cue-scene";
@@ -12,10 +12,13 @@ export async function listCueScene(): Promise<CueScene[]> {
       // Local mock fallback keeps the UI available during offline review.
     }
   }
-  return [...(mockData.cueScene as unknown as CueScene[])];
+  return getAll<CueScene>(STORES.cueScene);
 }
 
-export async function saveCueScene(payload: CueScene) {
-  console.info("save CueScene", payload);
-  return payload;
+export async function saveCueScene(payload: CueScene): Promise<CueScene> {
+  return putRow(STORES.cueScene, payload);
+}
+
+export async function removeCueScene(id: number): Promise<void> {
+  return deleteRow(STORES.cueScene, id);
 }

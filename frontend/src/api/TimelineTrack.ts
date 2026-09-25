@@ -1,4 +1,4 @@
-import { mockData } from "../mocks/seedData";
+import { getAll, putRow, STORES } from "../db";
 import type { TimelineTrack } from "../types/TimelineTrack";
 
 const endpoint = "/api/timeline-track";
@@ -12,10 +12,9 @@ export async function listTimelineTrack(): Promise<TimelineTrack[]> {
       // Local mock fallback keeps the UI available during offline review.
     }
   }
-  return [...(mockData.timelineTrack as unknown as TimelineTrack[])];
+  return getAll<TimelineTrack>(STORES.timelineTrack);
 }
 
-export async function saveTimelineTrack(payload: TimelineTrack) {
-  console.info("save TimelineTrack", payload);
-  return payload;
+export async function saveTimelineTrack(payload: TimelineTrack): Promise<TimelineTrack> {
+  return putRow(STORES.timelineTrack, payload);
 }

@@ -2,6 +2,18 @@
 
 纯前端舞台灯光编排工具，支持灯具通道、场景 Cue、时间轴预览和演出方案导出，所有数据存在 IndexedDB。
 
+## 核心业务（手工重排）
+
+- **派生草稿**：在 `/cues` 从已有场景“派生草稿”，自动带出全部灯具状态（颜色/亮度）、渐变时间（淡入/保持）与优先级；名称按“基础名 + 第一个未占用序号”补位，原场景不做任何修改。
+- **逐灯调光**：草稿中逐台灯调 R/G/B 与亮度，可加入/移除灯具。
+- **保存前校验（不通过即停下并逐条指出原因）**：
+  - 引用了已缺失的灯具 → 指出灯具 ID；
+  - 淡入/保持时长不是非负整数毫秒 → 指出字段；
+  - 名称末尾序号已被其他场景占用 → 指出占用场景名；
+  - 名称为空。
+- **归档占用关系**：仍被轨道引用的场景不能归档，归档入口禁用并提示“N 条轨道占用（#id(图层…)）”；到 `/timeline` 把轨道改指向新场景后，旧场景才可归档。已归档场景不能再被轨道引用，锁定轨道需先解锁。
+- **持久化**：派生场景与轨道指向写入 IndexedDB，重新打开页面后仍然可见（舞台预览页可核对）。
+
 ## 快速启动
 
 ```bash
@@ -32,8 +44,10 @@ cp .env.example .env && docker compose up -d
 ## 项目目录结构
 
 ```text
-frontend/src/api, stores, types, constants, constructors, components/common, hooks, pages, router, utils, mocks
+frontend/src/api, stores, types, constants, constructors, components/common, hooks, pages, router, utils, mocks, services, controllers, db
 ```
+
+关键分层：`db`（IndexedDB 连接/事务）→ `api`（按模型的数据访问）→ `services`（派生/校验/归档/改指向规则）→ `controllers`（异常二次包装）→ `stores`（Zustand）→ `pages/components`。
 
 ## 环境变量说明
 
@@ -51,7 +65,7 @@ frontend/src/api, stores, types, constants, constructors, components/common, hoo
 ## 枚举/常量出现位置清单
 
 - FixtureType: constants/FixtureType、types/FixtureType、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
-- CueStatus: constants/CueStatus、types/CueStatus、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
+- CueStatus: constants/CueStatus、types/CueStatus、constructors、logTemplates、errorMessages、errorCodes、services(CueSceneService)、controllers(CueSceneController)、stores(CueSceneStore)、筛选器、展示组件/控制器（StatusBadge、CueCard、CuesPage、TimelinePage、PreviewPage）均有引用。
 - ChannelMode: constants/ChannelMode、types/ChannelMode、constructors、logTemplates、errorMessages、筛选器、展示组件/控制器均有引用。
 
 ## 为什么会牵一发动全身

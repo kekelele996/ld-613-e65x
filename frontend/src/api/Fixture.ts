@@ -1,4 +1,4 @@
-import { mockData } from "../mocks/seedData";
+import { getAll, putRow, STORES } from "../db";
 import type { Fixture } from "../types/Fixture";
 
 const endpoint = "/api/fixture";
@@ -12,10 +12,9 @@ export async function listFixture(): Promise<Fixture[]> {
       // Local mock fallback keeps the UI available during offline review.
     }
   }
-  return [...(mockData.fixture as unknown as Fixture[])];
+  return getAll<Fixture>(STORES.fixture);
 }
 
-export async function saveFixture(payload: Fixture) {
-  console.info("save Fixture", payload);
-  return payload;
+export async function saveFixture(payload: Fixture): Promise<Fixture> {
+  return putRow(STORES.fixture, payload);
 }

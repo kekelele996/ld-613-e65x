@@ -1,4 +1,4 @@
-import { mockData } from "../mocks/seedData";
+import { getAll, putRow, STORES } from "../db";
 import type { ShowProject } from "../types/ShowProject";
 
 const endpoint = "/api/show-project";
@@ -12,10 +12,9 @@ export async function listShowProject(): Promise<ShowProject[]> {
       // Local mock fallback keeps the UI available during offline review.
     }
   }
-  return [...(mockData.showProject as unknown as ShowProject[])];
+ return getAll<ShowProject>(STORES.showProject);
 }
 
-export async function saveShowProject(payload: ShowProject) {
-  console.info("save ShowProject", payload);
-  return payload;
+export async function saveShowProject(payload: ShowProject): Promise<ShowProject> {
+  return putRow(STORES.showProject, payload);
 }

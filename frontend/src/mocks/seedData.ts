@@ -1,133 +1,127 @@
-export const mockData = {
-  "fixture": [
+import type { Fixture } from "../types/Fixture";
+import type { CueScene } from "../types/CueScene";
+import type { TimelineTrack } from "../types/TimelineTrack";
+import type { ShowProject } from "../types/ShowProject";
+
+/** 首次打开 IndexedDB 时的播种数据；之后以库内数据为准 */
+export const seedData = {
+  fixture: [
     {
-      "id": 1,
-      "fixture_code": "fixture code 1",
-      "fixture_type": "SPOT",
-      "position_x": "position x 1",
-      "position_y": "position y 1",
-      "dmx_address": "dmx address 1",
-      "channel_count": "channel count 1",
-      "color_mode": "color mode 1"
+      id: 1,
+      fixture_code: "PAR-01",
+      fixture_type: "PAR",
+      position_x: 120,
+      position_y: 80,
+      dmx_address: 1,
+      channel_count: 4,
+      color_mode: "RGB"
     },
     {
-      "id": 2,
-      "fixture_code": "fixture code 2",
-      "fixture_type": "WASH",
-      "position_x": "position x 2",
-      "position_y": "position y 2",
-      "dmx_address": "dmx address 2",
-      "channel_count": "channel count 2",
-      "color_mode": "color mode 2"
+      id: 2,
+      fixture_code: "SPOT-02",
+      fixture_type: "SPOT",
+      position_x: 300,
+      position_y: 60,
+      dmx_address: 17,
+      channel_count: 8,
+      color_mode: "MOVING_HEAD"
     },
     {
-      "id": 3,
-      "fixture_code": "fixture code 3",
-      "fixture_type": "BEAM",
-      "position_x": "position x 3",
-      "position_y": "position y 3",
-      "dmx_address": "dmx address 3",
-      "channel_count": "channel count 3",
-      "color_mode": "color mode 3"
+      id: 3,
+      fixture_code: "WASH-03",
+      fixture_type: "WASH",
+      position_x: 480,
+      position_y: 80,
+      dmx_address: 33,
+      channel_count: 6,
+      color_mode: "RGBW"
+    },
+    {
+      id: 4,
+      fixture_code: "BEAM-04",
+      fixture_type: "BEAM",
+      position_x: 220,
+      position_y: 200,
+      dmx_address: 49,
+      channel_count: 5,
+      color_mode: "MOVING_HEAD"
+    },
+    {
+      id: 5,
+      fixture_code: "STROBE-05",
+      fixture_type: "STROBE",
+      position_x: 400,
+      position_y: 200,
+      dmx_address: 65,
+      channel_count: 1,
+      color_mode: "DIMMER_ONLY"
     }
-  ],
-  "cueScene": [
+  ] as Fixture[],
+  cueScene: [
     {
-      "id": 1,
-      "name": "name 1",
-      "fixture_states": "fixture states 1",
-      "fade_in_ms": "fade in ms 1",
-      "hold_ms": "hold ms 1",
-      "priority": "priority 1",
-      "scene_status": "READY"
+      id: 1,
+      name: "开场 1",
+      fixture_states: [
+        { fixture_id: 1, red: 255, green: 180, blue: 60, brightness: 80 },
+        { fixture_id: 2, red: 255, green: 220, blue: 120, brightness: 90 },
+        { fixture_id: 3, red: 200, green: 120, blue: 40, brightness: 70 }
+      ],
+      fade_in_ms: 500,
+      hold_ms: 3000,
+      priority: 10,
+      scene_status: "READY"
     },
     {
-      "id": 2,
-      "name": "name 2",
-      "fixture_states": "fixture states 2",
-      "fade_in_ms": "fade in ms 2",
-      "hold_ms": "hold ms 2",
-      "priority": "priority 2",
-      "scene_status": "DISABLED"
+      id: 2,
+      name: "主唱 2",
+      fixture_states: [
+        { fixture_id: 2, red: 80, green: 140, blue: 255, brightness: 95 },
+        { fixture_id: 3, red: 120, green: 180, blue: 255, brightness: 85 },
+        { fixture_id: 4, red: 60, green: 100, blue: 220, brightness: 75 }
+      ],
+      fade_in_ms: 1000,
+      hold_ms: 4000,
+      priority: 20,
+      scene_status: "READY"
     },
     {
-      "id": 3,
-      "name": "name 3",
-      "fixture_states": "fixture states 3",
-      "fade_in_ms": "fade in ms 3",
-      "hold_ms": "hold ms 3",
-      "priority": "priority 3",
-      "scene_status": "DRAFT"
+      id: 3,
+      name: "尾声 3",
+      fixture_states: [
+        { fixture_id: 1, red: 255, green: 60, blue: 60, brightness: 60 },
+        { fixture_id: 5, red: 255, green: 255, blue: 255, brightness: 40 }
+      ],
+      fade_in_ms: 2000,
+      hold_ms: 5000,
+      priority: 5,
+      scene_status: "DRAFT"
+    },
+    {
+      id: 4,
+      name: "暖场备用",
+      fixture_states: [
+        { fixture_id: 1, red: 255, green: 240, blue: 200, brightness: 50 },
+        { fixture_id: 3, red: 255, green: 240, blue: 200, brightness: 50 }
+      ],
+      fade_in_ms: 800,
+      hold_ms: 6000,
+      priority: 1,
+      scene_status: "READY"
     }
-  ],
-  "timelineTrack": [
+  ] as CueScene[],
+  timelineTrack: [
+    { id: 1, cue_scene_id: 1, start_ms: 0, duration_ms: 3500, layer: 1, locked: false },
+    { id: 2, cue_scene_id: 2, start_ms: 3500, duration_ms: 5000, layer: 1, locked: false },
+    { id: 3, cue_scene_id: 1, start_ms: 0, duration_ms: 3500, layer: 2, locked: true }
+  ] as TimelineTrack[],
+  showProject: [
     {
-      "id": 1,
-      "cue_scene_id": 1,
-      "start_ms": "start ms 1",
-      "duration_ms": "duration ms 1",
-      "layer": "layer 1",
-      "locked": "locked 1"
-    },
-    {
-      "id": 2,
-      "cue_scene_id": 2,
-      "start_ms": "start ms 2",
-      "duration_ms": "duration ms 2",
-      "layer": "layer 2",
-      "locked": "locked 2"
-    },
-    {
-      "id": 3,
-      "cue_scene_id": 3,
-      "start_ms": "start ms 3",
-      "duration_ms": "duration ms 3",
-      "layer": "layer 3",
-      "locked": "locked 3"
+      id: 1,
+      title: "2026 秋季巡演",
+      venue_name: "滨江大剧院",
+      fixture_ids: [1, 2, 3, 4, 5],
+      track_ids: [1, 2, 3],
+      updated_at: "2026-09-20T09:00:00Z"
     }
-  ],
-  "showProject": [
-    {
-      "id": 1,
-      "title": "title 1",
-      "venue_name": "venue name 1",
-      "fixture_ids": [
-        1,
-        2
-      ],
-      "track_ids": [
-        1,
-        2
-      ],
-      "updated_at": "2026-06-11T09:00:00Z"
-    },
-    {
-      "id": 2,
-      "title": "title 2",
-      "venue_name": "venue name 2",
-      "fixture_ids": [
-        1,
-        2
-      ],
-      "track_ids": [
-        1,
-        2
-      ],
-      "updated_at": "2026-06-12T09:00:00Z"
-    },
-    {
-      "id": 3,
-      "title": "title 3",
-      "venue_name": "venue name 3",
-      "fixture_ids": [
-        1,
-        2
-      ],
-      "track_ids": [
-        1,
-        2
-      ],
-      "updated_at": "2026-06-13T09:00:00Z"
-    }
-  ]
-} as const;
+  ] as ShowProject[]
+};
